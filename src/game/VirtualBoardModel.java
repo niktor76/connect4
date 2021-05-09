@@ -80,7 +80,6 @@ public class VirtualBoardModel {
                     if (!vektors[row][col][RIGHT]) {
                         vektors[row][col][RIGHT] = true;
                         int tokenCounter = 1;
-                        int freeSpaceCounter = 0;
                         boolean isContinuing = true;
                         while ((col + tokenCounter < width) && isContinuing) {
                             if (board[row][col + tokenCounter] == playerNumber) {
@@ -117,68 +116,89 @@ public class VirtualBoardModel {
                     // look right/down
                     if (!vektors[row][col][RIGHT_DOWN]) {
                         vektors[row][col][RIGHT_DOWN] = true;
-                        int counter = 1;
+                        int tokenCounter = 1;
                         boolean isContinuing = true;
-                        while ((col + counter < width && row + counter < height) && isContinuing) {
-                            if (board[row + counter][col + counter] == playerNumber) {
+                        while ((col + tokenCounter < width && row + tokenCounter < height) && isContinuing) {
+                            if (board[row + tokenCounter][col + tokenCounter] == playerNumber) {
                                 vektors[row][col][RIGHT_DOWN] = true;
-                                counter++;
+                                tokenCounter++;
                                 isContinuing = true;
                             } else {
                                 isContinuing = false;
                             }
                         }
 
-                        if (board[row][col] == playerNumber) {
-                            ratingSum += getValueForLength(counter);
-                        } else {
-                            ratingSum -= getValueForLength(counter);
+                        int spaceCounter = tokenCounter;
+                        int counter = 1;
+                        while (spaceCounter < 4
+                                && (col - counter) >= 0
+                                && (row - counter) >= 0
+                                && board[row - counter][col - counter] == 0) {
+                            counter++;
+                            spaceCounter++;
+                        }
+
+                        counter = 1;
+                        while (spaceCounter < 4
+                                && (col + tokenCounter + counter) < width
+                                && (row + tokenCounter + counter) < height
+                                && board[row][col + tokenCounter + counter] == 0) {
+                            counter++;
+                            spaceCounter++;
+                        }
+
+                        if (spaceCounter > 3) {
+                            if (board[row][col] == playerNumber) {
+                                ratingSum += getValueForLength(tokenCounter);
+                            } else {
+                                ratingSum -= getValueForLength(tokenCounter);
+                            }
                         }
                     }
 
                     // look down
-                    if (!vektors[row][col][DOWN]) {
-                        vektors[row][col][DOWN] = true;
-                        int counter = 1;
-                        boolean isContinuing = true;
-                        while ((row + counter < height) && isContinuing) {
-                            if (board[row + counter][col] == playerNumber) {
-                                vektors[row][col][DOWN] = true;
-                                counter++;
-                                isContinuing = true;
-                            } else {
-                                isContinuing = false;
-                            }
-                        }
-
-                        if (board[row][col] == playerNumber) {
-                            ratingSum += getValueForLength(counter);
-                        } else {
-                            ratingSum -= getValueForLength(counter);
-                        }
-                    }
+//                    if (!vektors[row][col][DOWN]) {
+//                        vektors[row][col][DOWN] = true;
+//                        int counter = 1;
+//                        boolean isContinuing = true;
+//                        while ((row + counter < height) && isContinuing) {
+//                            if (board[row + counter][col] == playerNumber) {
+//                                vektors[row][col][DOWN] = true;
+//                                counter++;
+//                                isContinuing = true;
+//                            } else {
+//                                isContinuing = false;
+//                            }
+//                        }
+//
+//                        if (board[row][col] == playerNumber) {
+//                            ratingSum += getValueForLength(counter);
+//                        } else {
+//                            ratingSum -= getValueForLength(counter);
+//                        }
+//                    }
 
                     // look left/down
-                    if (!vektors[row][col][LEFT_DOWN]) {
-                        vektors[row][col][LEFT_DOWN] = true;
-                        int counter = 1;
-                        boolean isContinuing = true;
-                        while ((col - counter >= 0 && row + counter < height) && isContinuing) {
-                            if (board[row + counter][col - counter] == playerNumber) {
-                                vektors[row][col][LEFT_DOWN] = true;
-                                counter++;
-                                isContinuing = true;
-                            } else {
-                                isContinuing = false;
-                            }
-                        }
-
-                        if (board[row][col] == playerNumber) {
-                            ratingSum += getValueForLength(counter);
-                        } else {
-                            ratingSum -= getValueForLength(counter);
-                        }
-                    }
+//                    if (!vektors[row][col][LEFT_DOWN]) {
+//                        vektors[row][col][LEFT_DOWN] = true;
+//                        int counter = 1;
+//                        boolean isContinuing = true;
+//                        while ((col - counter >= 0 && row + counter < height) && isContinuing) {
+//                            if (board[row + counter][col - counter] == playerNumber) {
+//                                vektors[row][col][LEFT_DOWN] = true;
+//                                counter++;
+//                                isContinuing = true;
+//                            } else {
+//                                isContinuing = false;
+//                            }
+//                        }
+//
+//                        if (board[row][col] == playerNumber) {
+//                            ratingSum += getValueForLength(counter);
+//                        } else {
+//                            ratingSum -= getValueForLength(counter);
+//                        }
+//                    }
                 }
             }
         }
