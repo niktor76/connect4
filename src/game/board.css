@@ -1,0 +1,4 @@
+.board {
+    -fx-background-fill: black, white;
+    -fx-background-insets: 0, 1;
+}
