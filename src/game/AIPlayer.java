@@ -1,6 +1,9 @@
 package game;
 
-public class AIPlayer implements Player{
+import java.util.ArrayList;
+import java.util.Arrays;
+
+public class AIPlayer implements Player {
 
     private final BoardModel boardModel;
     private int playerNumber;
@@ -29,27 +32,88 @@ public class AIPlayer implements Player{
 
     @Override
     public void makeTurn() {
-        VirtualBoardModel virtualBoardModel = new VirtualBoardModel(boardModel.getBoard());
-        int columnOfChoice = recursiveMiniMax(virtualBoardModel, playerNumber, 1).columnIndex;
-        this.columnClicked(columnOfChoice);
-    }
+        MiniMaxResult miniMaxResult = new MiniMaxResult(Integer.MIN_VALUE, Integer.MIN_VALUE);
+        for (Integer columnIndex : boardModel.getFreeColumns()) {
+            VirtualBoardModel virtualBoardModel = new VirtualBoardModel(Arrays.stream(boardModel.getBoard()).map(int[]::clone).toArray(int[][]::new));
+            virtualBoardModel.makeTurnOnColumn(columnIndex, 1);
 
-    private MiniMaxResult recursiveMiniMax(VirtualBoardModel virtualBoardModel, int playerNumber, int depthCounter) {
-        MiniMaxResult bestResult = new MiniMaxResult(0,0);
-        for (Integer column: virtualBoardModel.getFreeColumns()){
-            VirtualBoardModel virtualBoardModelNextMove = new VirtualBoardModel(virtualBoardModel.getBoard());
-            virtualBoardModelNextMove.makeTurnOnColumn(column, playerNumber);
-            System.out.println(depthCounter);
-            if (depthCounter < maxDepth) {
-                int switchedPlayerNumber = playerNumber == 1 ? 2 : 1;
-                MiniMaxResult result = recursiveMiniMax(virtualBoardModelNextMove, switchedPlayerNumber, ++depthCounter);
-                bestResult = result.ratingOfColumn > bestResult.ratingOfColumn ? result : bestResult;
-            } else {
-                int rating = virtualBoardModel.getRating(playerNumber);
-                System.out.println(rating);
-                bestResult = new MiniMaxResult(rating, column);
+            int ratingOfColumn = recursiveMiniMax(virtualBoardModel, playerNumber, 1);
+            System.out.println(columnIndex + ": " + ratingOfColumn);
+            if (ratingOfColumn > miniMaxResult.ratingOfColumn) {
+                miniMaxResult.ratingOfColumn = ratingOfColumn;
+                miniMaxResult.columnIndex = columnIndex;
             }
         }
-        return bestResult;
+        System.out.println("column of choice: " + miniMaxResult.columnIndex);
+        this.columnClicked(miniMaxResult.columnIndex);
     }
+
+    private int recursiveMiniMax(VirtualBoardModel virtualBoardModel, int currentVirtualPlayerNumber, int depthCounter) {
+        int bestRating;
+        if (currentVirtualPlayerNumber == this.playerNumber) {
+            bestRating = Integer.MIN_VALUE;
+        } else {
+             bestRating = Integer.MAX_VALUE;
+        }
+        int nextVirtualPlayerNumber = currentVirtualPlayerNumber == 1 ? 2 : 1;
+        for (Integer column : virtualBoardModel.getFreeColumns()) {
+            int[][] virtualBoard = virtualBoardModel.getBoard();
+            VirtualBoardModel virtualBoardModelNextMove = new VirtualBoardModel(Arrays.stream(virtualBoard).map(int[]::clone).toArray(int[][]::new));
+            virtualBoardModelNextMove.makeTurnOnColumn(column, currentVirtualPlayerNumber);
+            if (depthCounter < maxDepth) {
+                int rating = recursiveMiniMax(virtualBoardModelNextMove, nextVirtualPlayerNumber, ++depthCounter);
+                if (currentVirtualPlayerNumber == this.playerNumber) {
+                    bestRating = Math.max(bestRating, rating);
+                } else {
+                    bestRating = Math.min(bestRating, rating);
+                }
+            } else {
+                return virtualBoardModel.getRating(currentVirtualPlayerNumber);
+            }
+        }
+        return bestRating;
+    }
+//    @Override
+//    public void makeTurn() {
+//        int[][] board = boardModel.getBoard();
+//        VirtualBoardModel virtualBoardModel = new VirtualBoardModel(Arrays.stream(board).map(int[]::clone).toArray(int[][]::new));
+//        int columnOfChoice = recursiveMiniMax(virtualBoardModel, playerNumber, 1).columnIndex;
+//        this.columnClicked(columnOfChoice);
+//    }
+//
+//    private MiniMaxResult recursiveMiniMax(VirtualBoardModel virtualBoardModel, int currentVirtualPlayerNumber, int depthCounter) {
+//        ArrayList<MiniMaxResult> miniMaxResults = new ArrayList<>();
+//        MiniMaxResult bestResult = new MiniMaxResult(0, 0);
+//        int bestRating = 0;
+//        int nextVirtualPlayerNumber = currentVirtualPlayerNumber == 1 ? 2 : 1;
+//        for (Integer column : virtualBoardModel.getFreeColumns()) {
+//            int[][] virtualBoard = virtualBoardModel.getBoard();
+//            VirtualBoardModel virtualBoardModelNextMove = new VirtualBoardModel(Arrays.stream(virtualBoard).map(int[]::clone).toArray(int[][]::new));
+//            virtualBoardModelNextMove.makeTurnOnColumn(column, currentVirtualPlayerNumber);
+//            if (depthCounter < maxDepth) {
+//                MiniMaxResult result = recursiveMiniMax(virtualBoardModelNextMove, nextVirtualPlayerNumber, ++depthCounter);
+//                miniMaxResults.add(new MiniMaxResult(result.ratingOfColumn, column));
+//                if (currentVirtualPlayerNumber == this.playerNumber) {
+//                    if (result.ratingOfColumn > bestRating) {
+//                        bestRating = result.ratingOfColumn;
+//                        bestResult = new MiniMaxResult(bestRating, column);
+//                    }
+//                } else {
+//                    if (result.ratingOfColumn < bestRating) {
+//                        bestRating = result.ratingOfColumn;
+//                        bestResult = new MiniMaxResult(bestRating, column);
+//                    }
+//
+//                }
+//            } else {
+//                int rating = virtualBoardModel.getRating(currentVirtualPlayerNumber);
+//                bestResult = new MiniMaxResult(rating, column);
+//            }
+//        }
+//        miniMaxResults.forEach(miniMaxResult -> {
+//            System.out.println(miniMaxResult.columnIndex + " " + miniMaxResult.ratingOfColumn);
+//        });
+//        System.out.println("bestResult: " + bestResult.columnIndex + " : " + bestResult.ratingOfColumn);
+//        return bestResult;
+//    }
 }

@@ -42,7 +42,6 @@ public class BoardModel {
                 freeColumns.add(col);
             }
         }
-        System.out.println(freeColumns);
         return freeColumns;
     }
 
@@ -71,4 +70,16 @@ public class BoardModel {
         }
         boardView.refreshBoardView();
     }
+
+    public void printBoard() {
+        System.out.println("board");
+        for (int r = 0; r < 6; r++) {
+            for (int c = 0; c < 7; c++) {
+                System.out.print(board[r][c] + " ");
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+
 }

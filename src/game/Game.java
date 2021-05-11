@@ -18,7 +18,7 @@ public class Game implements InputListener{
         this.controller.setGame(this);
         boardModel = new BoardModel(boardView, this);
         player1 = new HumanPlayer(boardModel, 1);
-        player2 = new AIPlayer(boardModel, 2, 3);
+        player2 = new AIPlayer(boardModel, 2, 13);
         boardView.setBoardModel(boardModel);
         currentPlayer = player1;
         boardView.refreshBoardView();
@@ -34,12 +34,14 @@ public class Game implements InputListener{
     }
 
     public void changePlayer() {
+        System.out.println(currentPlayer);
         if (currentPlayer == player1) {
             currentPlayer = player2;
         } else {
             currentPlayer = player1;
         }
         if (currentPlayer instanceof AIPlayer) {
+            System.out.println(currentPlayer);
             currentPlayer.makeTurn();
         }
     }
